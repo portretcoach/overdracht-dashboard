@@ -309,6 +309,34 @@ const hondenChecklist = createChecklist('birdnest_transfer_honden', 'transfer-no
 // === House Notes ===
 const houseChecklist = createChecklist('birdnest_house_notes', 'house-notes-list', 'house-note-form', 'house-note-input', 'Geen notities over het huis.');
 
+// === Cleaning Auto-Reset (elke dinsdag) ===
+function getMostRecentTuesday() {
+    const today = new Date();
+    const day = today.getDay(); // 0=zo, 1=ma, 2=di, ...
+    let diff;
+    if (day >= 2) {
+        diff = day - 2; // di=0, wo=1, do=2, vr=3, za=4
+    } else {
+        diff = day + 5; // zo=5, ma=6
+    }
+    const tuesday = new Date(today);
+    tuesday.setDate(today.getDate() - diff);
+    return dateToStr(tuesday);
+}
+
+function checkCleaningAutoReset() {
+    const lastReset = localStorage.getItem('birdnest_cleaning_last_reset');
+    const recentTuesday = getMostRecentTuesday();
+
+    if (!lastReset || lastReset < recentTuesday) {
+        // Reset alle schoonmaaktaken
+        const tasks = getCleaningTasks();
+        tasks.forEach(t => t.checked = false);
+        saveCleaningTasks(tasks);
+        localStorage.setItem('birdnest_cleaning_last_reset', recentTuesday);
+    }
+}
+
 // === Cleaning Checklist ===
 const DEFAULT_CLEANING_TASKS = [
     'Stofzuigen woonkamer',
@@ -441,6 +469,7 @@ function init() {
     hondenChecklist.initForm(); hondenChecklist.render();
     houseChecklist.initForm(); houseChecklist.render();
     initCleaningForm();
+    checkCleaningAutoReset();
     renderCleaningTasks();
     initNoteForm();
     renderNotes();
