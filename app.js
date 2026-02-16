@@ -7,7 +7,11 @@ const STORAGE_KEYS = {
 
 const DAYS_NL = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
 
-// === LocalStorage Helpers ===
+// === Firebase ===
+const db = firebase.database();
+const DB_ROOT = 'birdnest';
+
+// === Storage Helpers (localStorage + Firebase) ===
 function loadData(key) {
     try {
         const data = localStorage.getItem(key);
@@ -19,6 +23,7 @@ function loadData(key) {
 
 function saveData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
+    db.ref(DB_ROOT + '/' + key).set(data);
 }
 
 // === Settings ===
@@ -325,7 +330,7 @@ function getMostRecentTuesday() {
 }
 
 function checkCleaningAutoReset() {
-    const lastReset = localStorage.getItem('birdnest_cleaning_last_reset');
+    const lastReset = loadData('birdnest_cleaning_last_reset');
     const recentTuesday = getMostRecentTuesday();
 
     if (!lastReset || lastReset < recentTuesday) {
@@ -333,7 +338,7 @@ function checkCleaningAutoReset() {
         const tasks = getCleaningTasks();
         tasks.forEach(t => t.checked = false);
         saveCleaningTasks(tasks);
-        localStorage.setItem('birdnest_cleaning_last_reset', recentTuesday);
+        saveData('birdnest_cleaning_last_reset', recentTuesday);
     }
 }
 
@@ -460,8 +465,62 @@ function initCleaningForm() {
     });
 }
 
+// === Firebase Real-time Sync ===
+function setupRealtimeSync() {
+    const keysToSync = [
+        { key: 'birdnest_settings', render: () => { updateWeekSection(); } },
+        { key: 'birdnest_notes', render: renderNotes },
+        { key: 'birdnest_transfer_maya', render: () => mayaChecklist.render() },
+        { key: 'birdnest_transfer_izzie', render: () => izzieChecklist.render() },
+        { key: 'birdnest_transfer_honden', render: () => hondenChecklist.render() },
+        { key: 'birdnest_house_notes', render: () => houseChecklist.render() },
+        { key: 'birdnest_cleaning', render: renderCleaningTasks },
+        { key: 'birdnest_cleaning_last_reset', render: () => {} },
+    ];
+
+    keysToSync.forEach(({ key, render }) => {
+        db.ref(DB_ROOT + '/' + key).on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data !== null && data !== undefined) {
+                // Update local cache en re-render
+                localStorage.setItem(key, JSON.stringify(data));
+                render();
+            }
+        });
+    });
+}
+
+// === Eenmalige migratie localStorage → Firebase ===
+function migrateLocalStorageToFirebase() {
+    const migrated = localStorage.getItem('birdnest_firebase_migrated');
+    if (migrated) return;
+
+    const keysToMigrate = [
+        'birdnest_settings', 'birdnest_notes', 'birdnest_calendar',
+        'birdnest_transfer_maya', 'birdnest_transfer_izzie',
+        'birdnest_transfer_honden', 'birdnest_house_notes',
+        'birdnest_cleaning', 'birdnest_cleaning_last_reset'
+    ];
+
+    const updates = {};
+    keysToMigrate.forEach(key => {
+        const data = loadData(key);
+        if (data !== null) {
+            updates[DB_ROOT + '/' + key] = data;
+        }
+    });
+
+    if (Object.keys(updates).length > 0) {
+        db.ref().update(updates);
+    }
+    localStorage.setItem('birdnest_firebase_migrated', 'true');
+}
+
 // === Init ===
 function init() {
+    // Migreer bestaande data naar Firebase (eenmalig)
+    migrateLocalStorageToFirebase();
+
     initSettings();
     updateWeekSection();
     mayaChecklist.initForm(); mayaChecklist.render();
@@ -473,6 +532,9 @@ function init() {
     renderCleaningTasks();
     initNoteForm();
     renderNotes();
+
+    // Start real-time sync met Firebase
+    setupRealtimeSync();
 }
 
 document.addEventListener('DOMContentLoaded', init);
