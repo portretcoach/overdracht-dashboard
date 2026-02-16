@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Nesting Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🏠 Bird Nesting Dashboard</h1>
+        <p class="subtitle">Co-ouderschap overdracht</p>
+    </header>
+
+    <main>
+        <!-- Deze week -->
+        <section class="today-section">
+            <div class="week-card">
+                <h2>Deze week</h2>
+                <div id="week-parent" class="week-parent"></div>
+                <div id="week-overview" class="week-overview"></div>
+            </div>
+        </section>
+
+        <!-- Overdrachtsnotities -->
+        <div class="transfer-grid">
+            <section class="transfer-notes-section">
+                <h2>🧒 Maya</h2>
+                <form id="transfer-note-form-maya" class="transfer-note-form">
+                    <input type="text" id="transfer-note-input-maya" placeholder="Notitie over Maya..." maxlength="200" required>
+                    <button type="submit" class="btn-add-transfer">+</button>
+                </form>
+                <ul id="transfer-notes-list-maya" class="transfer-notes-list"></ul>
+            </section>
+            <section class="transfer-notes-section">
+                <h2>👧 Izzie</h2>
+                <form id="transfer-note-form-izzie" class="transfer-note-form">
+                    <input type="text" id="transfer-note-input-izzie" placeholder="Notitie over Izzie..." maxlength="200" required>
+                    <button type="submit" class="btn-add-transfer">+</button>
+                </form>
+                <ul id="transfer-notes-list-izzie" class="transfer-notes-list"></ul>
+            </section>
+            <section class="transfer-notes-section">
+                <h2>🐕 Honden</h2>
+                <form id="transfer-note-form-honden" class="transfer-note-form">
+                    <input type="text" id="transfer-note-input-honden" placeholder="Notitie over de honden..." maxlength="200" required>
+                    <button type="submit" class="btn-add-transfer">+</button>
+                </form>
+                <ul id="transfer-notes-list-honden" class="transfer-notes-list"></ul>
+            </section>
+        </div>
+
+        <!-- Google Agenda -->
+        <section class="google-calendar-section">
+            <h2>Google Agenda</h2>
+            <div class="google-calendar-container">
+                <iframe
+                    src="https://calendar.google.com/calendar/embed?src=family02007762560752635542%40group.calendar.google.com&ctz=Europe%2FAmsterdam&hl=nl&showTitle=0&showNav=1&showPrint=0&showTabs=1&showCalendars=0&wkst=2"
+                    frameborder="0"
+                    scrolling="no"
+                    class="google-calendar-iframe"
+                ></iframe>
+            </div>
+        </section>
+
+        <!-- Schoonmaak -->
+        <section class="cleaning-section">
+            <div class="cleaning-header">
+                <h2>🧹 Schoonmaak</h2>
+                <div class="cleaning-actions">
+                    <span id="cleaning-progress" class="cleaning-progress"></span>
+                    <button id="cleaning-reset" class="btn-reset" style="display:none;">Alles resetten</button>
+                </div>
+            </div>
+            <form id="cleaning-form" class="transfer-note-form">
+                <input type="text" id="cleaning-input" placeholder="Voeg een schoonmaaktaak toe..." maxlength="200" required>
+                <button type="submit" class="btn-add-transfer">+</button>
+            </form>
+            <ul id="cleaning-list" class="transfer-notes-list"></ul>
+        </section>
+
+        <!-- Huisnotities -->
+        <section class="house-notes-section">
+            <h2>🏠 Notities over het huis</h2>
+            <form id="house-note-form" class="transfer-note-form">
+                <input type="text" id="house-note-input" placeholder="Voeg een notitie toe over het huis..." maxlength="200" required>
+                <button type="submit" class="btn-add-transfer">+</button>
+            </form>
+            <ul id="house-notes-list" class="transfer-notes-list"></ul>
+        </section>
+
+        <!-- Notities -->
+        <section class="notes-section">
+            <h2>Notities & Mededelingen</h2>
+            <form id="note-form" class="note-form">
+                <input type="date" id="note-date" required>
+                <textarea id="note-text" placeholder="Schrijf een notitie..." rows="3" required></textarea>
+                <button type="submit" class="btn-add">Notitie toevoegen</button>
+            </form>
+            <div id="notes-list" class="notes-list"></div>
+        </section>
+
+        <!-- Instellingen -->
+        <section class="settings-section">
+            <h2>Instellingen</h2>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label for="parent-a-name">Naam ouder oneven weken</label>
+                    <input type="text" id="parent-a-name" placeholder="Iris" maxlength="30">
+                </div>
+                <div class="setting-item">
+                    <label for="parent-b-name">Naam ouder even weken</label>
+                    <input type="text" id="parent-b-name" placeholder="Koen" maxlength="30">
+                </div>
+                <div class="setting-item">
+                    <label for="child-1-name">Naam Kind 1</label>
+                    <input type="text" id="child-1-name" placeholder="Kind 1" maxlength="30">
+                </div>
+                <div class="setting-item">
+                    <label for="child-2-name">Naam Kind 2</label>
+                    <input type="text" id="child-2-name" placeholder="Kind 2" maxlength="30">
+                </div>
+            </div>
+            <button id="save-settings" class="btn-save">Opslaan</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>Bird Nesting Co-ouderschap Dashboard</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
